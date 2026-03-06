@@ -14,17 +14,29 @@ await fastify.register(jwt, { secret: process.env.JWT_SECRET });
 
 fastify.decorate('authenticate', async (request, reply) => {
   try {
-    console.log('=== AUTH MIDDLEWARE START ===');
-    console.log('AUTH HEADER:', request.headers.authorization);
+    const authHeader = request.headers.authorization;
 
-    await request.jwtVerify();
+    if (!authHeader) {
+      return reply.code(401).send({ error: 'Unauthorized: no authorization header' });
+    }
 
-    console.log('JWT USER:', request.user);
-    console.log('=== AUTH MIDDLEWARE OK ===');
+    if (!authHeader.startsWith('Bearer ')) {
+      return reply.code(401).send({ error: 'Unauthorized: invalid authorization format' });
+    }
+
+    const token = authHeader.slice(7).trim();
+
+    if (!token) {
+      return reply.code(401).send({ error: 'Unauthorized: empty token' });
+    }
+
+    const decoded = fastify.jwt.verify(token);
+    request.user = decoded;
+
+    console.log('AUTH HEADER OK');
+    console.log('DECODED USER:', decoded);
   } catch (err) {
-    console.log('=== AUTH MIDDLEWARE ERROR ===');
-    console.log('AUTH HEADER:', request.headers.authorization);
-    console.log('JWT ERROR:', err.message);
+    console.log('JWT VERIFY ERROR:', err.message);
     return reply.code(401).send({ error: 'Unauthorized' });
   }
 });
