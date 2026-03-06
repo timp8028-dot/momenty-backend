@@ -9,23 +9,26 @@ import albumsRoutes from './routes/albums.js';
 
 const fastify = Fastify({ logger: true });
 
-// Plugins
 await fastify.register(cors, { origin: true });
 await fastify.register(jwt, { secret: process.env.JWT_SECRET });
 
-// Auth decorator
 fastify.decorate('authenticate', async (request, reply) => {
   try {
+    console.log('=== AUTH MIDDLEWARE START ===');
     console.log('AUTH HEADER:', request.headers.authorization);
+
     await request.jwtVerify();
+
     console.log('JWT USER:', request.user);
+    console.log('=== AUTH MIDDLEWARE OK ===');
   } catch (err) {
+    console.log('=== AUTH MIDDLEWARE ERROR ===');
+    console.log('AUTH HEADER:', request.headers.authorization);
     console.log('JWT ERROR:', err.message);
     return reply.code(401).send({ error: 'Unauthorized' });
   }
 });
 
-// Routes
 await fastify.register(authRoutes, { prefix: '/auth' });
 await fastify.register(photosRoutes, {
   prefix: '/photos',
@@ -36,7 +39,6 @@ await fastify.register(albumsRoutes, {
   preHandler: [fastify.authenticate],
 });
 
-// Health check
 fastify.get('/health', async () => ({ status: 'ok' }));
 
 export default fastify;
