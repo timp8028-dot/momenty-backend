@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id         String   @id @default(cuid())
+  email      String   @unique
+  googleId   String?  @unique @map("google_id")
+  telegramId String?  @unique @map("telegram_id")
+  name       String?
+  avatar     String?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  photos    Photo[]
+  albums    Album[]
+  driveSync DriveSync?
+
+  @@map("users")
+}
+
+model Album {
+  id         String   @id @default(cuid())
+  name       String
+  coverPhoto String?  @map("cover_photo")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  photos Photo[]
+
+  @@map("albums")
+}
+
+model Photo {
+  id          String   @id @default(cuid())
+  url         String
+  filename    String
+  size        Int
+  storagePath String?  @map("storage_path")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  userId  String  @map("user_id")
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  albumId String? @map("album_id")
+  album   Album?  @relation(fields: [albumId], references: [id], onDelete: SetNull)
+
+  @@map("photos")
+}
+
+model DriveSync {
+  id            String   @id @default(cuid())
+  driveFolderId String?  @map("drive_folder_id")
+  status        String   @default("inactive")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  userId String @unique @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("drive_sync")
+}
