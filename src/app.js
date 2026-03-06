@@ -16,8 +16,11 @@ await fastify.register(jwt, { secret: process.env.JWT_SECRET });
 // Auth decorator
 fastify.decorate('authenticate', async (request, reply) => {
   try {
+    console.log('AUTH HEADER:', request.headers.authorization);
     await request.jwtVerify();
-  } catch {
+    console.log('JWT USER:', request.user);
+  } catch (err) {
+    console.log('JWT ERROR:', err.message);
     return reply.code(401).send({ error: 'Unauthorized' });
   }
 });
