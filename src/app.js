@@ -14,7 +14,7 @@ await fastify.register(cors, { origin: true });
 await fastify.register(jwt, { secret: process.env.JWT_SECRET });
 await fastify.register(multipart);
 
-// Временно оставляем decorator, но не используем на роуты
+// Временно оставляем decorator, но не вешаем его на роуты
 fastify.decorate('authenticate', async (request, reply) => {
   const authHeader = request.headers.authorization;
 
