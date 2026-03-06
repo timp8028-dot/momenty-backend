@@ -18,14 +18,20 @@ fastify.decorate('authenticate', async (request, reply) => {
   try {
     await request.jwtVerify();
   } catch {
-    reply.code(401).send({ error: 'Unauthorized' });
+    return reply.code(401).send({ error: 'Unauthorized' });
   }
 });
 
 // Routes
 await fastify.register(authRoutes, { prefix: '/auth' });
-await fastify.register(photosRoutes, { prefix: '/photos', preHandler: [fastify.authenticate] });
-await fastify.register(albumsRoutes, { prefix: '/albums', preHandler: [fastify.authenticate] });
+await fastify.register(photosRoutes, {
+  prefix: '/photos',
+  preHandler: [fastify.authenticate],
+});
+await fastify.register(albumsRoutes, {
+  prefix: '/albums',
+  preHandler: [fastify.authenticate],
+});
 
 // Health check
 fastify.get('/health', async () => ({ status: 'ok' }));
