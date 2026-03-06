@@ -2,6 +2,7 @@ import 'dotenv/config';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import jwt from '@fastify/jwt';
+import multipart from '@fastify/multipart';
 
 import authRoutes from './routes/auth.js';
 import photosRoutes from './routes/photos.js';
@@ -11,8 +12,9 @@ const fastify = Fastify({ logger: true });
 
 await fastify.register(cors, { origin: true });
 await fastify.register(jwt, { secret: process.env.JWT_SECRET });
+await fastify.register(multipart);
 
-// ВРЕМЕННО оставляем decorator, но не используем его на роуты
+// Временно оставляем decorator, но не используем на роуты
 fastify.decorate('authenticate', async (request, reply) => {
   const authHeader = request.headers.authorization;
 
@@ -34,10 +36,7 @@ fastify.decorate('authenticate', async (request, reply) => {
   request.user = decoded;
 });
 
-// Auth
 await fastify.register(authRoutes, { prefix: '/auth' });
-
-// ВРЕМЕННО БЕЗ preHandler
 await fastify.register(photosRoutes, { prefix: '/photos' });
 await fastify.register(albumsRoutes, { prefix: '/albums' });
 
