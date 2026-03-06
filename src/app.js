@@ -12,6 +12,7 @@ const fastify = Fastify({ logger: true });
 await fastify.register(cors, { origin: true });
 await fastify.register(jwt, { secret: process.env.JWT_SECRET });
 
+// ВРЕМЕННО оставляем decorator, но не используем его на роуты
 fastify.decorate('authenticate', async (request, reply) => {
   const authHeader = request.headers.authorization;
 
@@ -26,9 +27,6 @@ fastify.decorate('authenticate', async (request, reply) => {
   const token = authHeader.slice(7).trim();
   const decoded = fastify.jwt.decode(token);
 
-  console.log('AUTH HEADER:', authHeader);
-  console.log('DECODED:', decoded);
-
   if (!decoded || !decoded.id) {
     return reply.code(401).send({ error: 'Unauthorized: invalid token payload' });
   }
@@ -36,15 +34,12 @@ fastify.decorate('authenticate', async (request, reply) => {
   request.user = decoded;
 });
 
+// Auth
 await fastify.register(authRoutes, { prefix: '/auth' });
-await fastify.register(photosRoutes, {
-  prefix: '/photos',
-  preHandler: [fastify.authenticate],
-});
-await fastify.register(albumsRoutes, {
-  prefix: '/albums',
-  preHandler: [fastify.authenticate],
-});
+
+// ВРЕМЕННО БЕЗ preHandler
+await fastify.register(photosRoutes, { prefix: '/photos' });
+await fastify.register(albumsRoutes, { prefix: '/albums' });
 
 fastify.get('/health', async () => ({ status: 'ok' }));
 
