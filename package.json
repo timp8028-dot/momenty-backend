@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "",
@@ -20,10 +21,10 @@
     "@supabase/supabase-js": "^2.98.0",
     "dotenv": "^17.3.1",
     "fastify": "^5.8.1",
-    "pg": "^8.20.0"
+    "pg": "^8.20.0",
+    "prisma": "^7.4.2"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14",
-    "prisma": "^7.4.2"
+    "nodemon": "^3.1.14"
   }
 }
