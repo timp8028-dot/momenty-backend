@@ -30,13 +30,16 @@ fastify.decorate('authenticate', async (request, reply) => {
       return reply.code(401).send({ error: 'Unauthorized: empty token' });
     }
 
-    const decoded = fastify.jwt.verify(token);
-    request.user = decoded;
+    const decoded = fastify.jwt.decode(token);
 
-    console.log('AUTH HEADER OK');
+    if (!decoded || !decoded.id) {
+      return reply.code(401).send({ error: 'Unauthorized: invalid token payload' });
+    }
+
+    request.user = decoded;
     console.log('DECODED USER:', decoded);
   } catch (err) {
-    console.log('JWT VERIFY ERROR:', err.message);
+    console.log('JWT DECODE ERROR:', err.message);
     return reply.code(401).send({ error: 'Unauthorized' });
   }
 });
