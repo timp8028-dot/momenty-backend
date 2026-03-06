@@ -13,35 +13,27 @@ await fastify.register(cors, { origin: true });
 await fastify.register(jwt, { secret: process.env.JWT_SECRET });
 
 fastify.decorate('authenticate', async (request, reply) => {
-  try {
-    const authHeader = request.headers.authorization;
+  const authHeader = request.headers.authorization;
 
-    if (!authHeader) {
-      return reply.code(401).send({ error: 'Unauthorized: no authorization header' });
-    }
-
-    if (!authHeader.startsWith('Bearer ')) {
-      return reply.code(401).send({ error: 'Unauthorized: invalid authorization format' });
-    }
-
-    const token = authHeader.slice(7).trim();
-
-    if (!token) {
-      return reply.code(401).send({ error: 'Unauthorized: empty token' });
-    }
-
-    const decoded = fastify.jwt.decode(token);
-
-    if (!decoded || !decoded.id) {
-      return reply.code(401).send({ error: 'Unauthorized: invalid token payload' });
-    }
-
-    request.user = decoded;
-    console.log('DECODED USER:', decoded);
-  } catch (err) {
-    console.log('JWT DECODE ERROR:', err.message);
-    return reply.code(401).send({ error: 'Unauthorized' });
+  if (!authHeader) {
+    return reply.code(401).send({ error: 'Unauthorized: no authorization header' });
   }
+
+  if (!authHeader.startsWith('Bearer ')) {
+    return reply.code(401).send({ error: 'Unauthorized: invalid authorization format' });
+  }
+
+  const token = authHeader.slice(7).trim();
+  const decoded = fastify.jwt.decode(token);
+
+  console.log('AUTH HEADER:', authHeader);
+  console.log('DECODED:', decoded);
+
+  if (!decoded || !decoded.id) {
+    return reply.code(401).send({ error: 'Unauthorized: invalid token payload' });
+  }
+
+  request.user = decoded;
 });
 
 await fastify.register(authRoutes, { prefix: '/auth' });
