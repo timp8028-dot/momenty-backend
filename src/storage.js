@@ -6,6 +6,7 @@ const supabase = createClient(
 );
 
 const BUCKET = process.env.SUPABASE_BUCKET;
+console.log('[storage] BUCKET:', BUCKET);
 
 export async function uploadPhoto(userId, filename, buffer, mimetype) {
   const path = `${userId}/${Date.now()}_${filename}`;
