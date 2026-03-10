@@ -12,7 +12,7 @@ const fastify = Fastify({ logger: true });
 
 await fastify.register(cors, { origin: true });
 await fastify.register(jwt, { secret: process.env.JWT_SECRET });
-await fastify.register(multipart);
+await fastify.register(multipart, { limits: { fileSize: 50 * 1024 * 1024 } });
 
 // Временно оставляем decorator, но не вешаем его на роуты
 fastify.decorate('authenticate', async (request, reply) => {
