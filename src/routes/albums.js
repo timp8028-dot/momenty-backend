@@ -1,6 +1,8 @@
 import prisma from '../db.js';
 
 export default async function albumsRoutes(fastify) {
+  fastify.addHook('preHandler', fastify.authenticate);
+
   // GET /albums
   fastify.get('/', async (request) => {
     const userId = request.user.id;

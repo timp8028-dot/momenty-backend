@@ -2,6 +2,8 @@ import prisma from '../db.js';
 import { uploadPhoto, deletePhoto } from '../storage.js';
 
 export default async function photosRoutes(fastify) {
+  fastify.addHook('preHandler', fastify.authenticate);
+
   // GET /photos — список фото пользователя
   fastify.get('/', async (request) => {
     const { albumId } = request.query;
