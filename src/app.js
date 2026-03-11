@@ -10,7 +10,12 @@ import albumsRoutes from './routes/albums.js';
 
 const fastify = Fastify({ logger: true });
 
-await fastify.register(cors, { origin: true });
+await fastify.register(cors, {
+  origin: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+});
 await fastify.register(jwt, { secret: process.env.JWT_SECRET });
 await fastify.register(multipart, { limits: { fileSize: 50 * 1024 * 1024 } });
 
