@@ -49,9 +49,12 @@ export default async function photosRoutes(fastify) {
     const photo = await prisma.photo.findFirst({ where: { id, userId } });
     if (!photo) return reply.code(404).send({ error: 'Photo not found' });
 
-    if (photo.storagePath) await deletePhoto(photo.storagePath);
-    await prisma.photo.delete({ where: { id } });
+    if (photo.storagePath) {
+      try { await deletePhoto(photo.storagePath); }
+      catch (e) { fastify.log.warn('[delete] Storage error:', e.message); }
+    }
 
-    return { success: true };
+    await prisma.photo.delete({ where: { id } });
+    reply.code(204).send();
   });
 }
